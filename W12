@@ -1,0 +1,58 @@
+section .data
+    msg_odd db 'Odd', 0
+    msg_even db 'Even', 0
+    newline db 10
+
+section .text
+    global _start
+
+_start:
+    mov eax, 8721
+
+    call check_odd_even
+
+    mov edx, msg_odd
+    cmp byte [is_even], 1
+    je even_found
+    mov edx, msg_even
+
+even_found:
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, edx
+    mov edx, 4
+    int 0x80
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, newline
+    mov edx, 1
+    int 0x80
+
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
+
+check_odd_even:
+    push eax
+
+    mov ebx, 2
+    xor edx, edx
+    div ebx
+
+    test edx, edx
+    jnz is_even_number
+    mov byte [is_even], 0
+    jmp done_checking
+
+is_even_number:
+    mov byte [is_even], 1
+
+done_checking:
+
+    pop eax
+
+    ret
+
+section .bss
+    is_even resb 1
